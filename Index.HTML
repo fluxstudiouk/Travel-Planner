@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ffffff">
-    <title>여행 일정 관리 (Full Data Fixed)</title>
+    <title>여행 일정 관리 (Mobile Optimized)</title>
     <style>
         /* === 기본 설정 === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -54,17 +54,26 @@
         /* === 헤더 === */
         .header { background: var(--bg-secondary); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 1000; padding: 16px; }
         .header-content { max-width: 1024px; margin: 0 auto; }
-        .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; } /* align-items: center로 변경하여 수직 중앙 정렬 */
         
-        .trip-info h1 { font-size: 24px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.5px; }
+        .trip-info { flex: 1; min-width: 0; /* 텍스트 넘침 방지 */ }
+        .trip-name { font-size: 24px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .trip-meta-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 8px; }
         .trip-details { font-size: 14px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 2px; }
         
-        /* D-Day 배지 */
+        /* D-Day 배지 (모바일 최적화 적용) */
         .dday-badge { 
-            font-size: 20px; font-weight: 800; color: var(--text-primary); 
-            border: 2px solid var(--text-primary); padding: 4px 12px; 
-            border-radius: var(--btn-radius); 
+            font-size: 20px; 
+            font-weight: 800; 
+            color: var(--text-primary); 
+            border: 2px solid var(--text-primary); 
+            padding: 4px 12px; 
+            border-radius: var(--btn-radius);
+            
+            /* [수정됨] 줄바꿈 방지 및 크기 고정 */
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-left: 8px;
         }
 
         /* === 🕒 스마트 시계 === */
@@ -218,6 +227,7 @@
         .res-icon { flex-shrink: 0; width: 14px; text-align: center; }
         .res-text { color: var(--text-secondary); }
         .res-label { font-weight: 700; color: var(--dining-color); margin-right: 2px; }
+        .btn-map-sm { font-size: 11px; padding: 3px 8px; background: #e0f2fe; color: #0284c7; border-radius: 6px; text-decoration: none; font-weight: 600; }
         .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2999; display: none; }
         .drawer-overlay.show { display: block; }
 
@@ -229,6 +239,14 @@
         .chat-msg.ai { background: white; border: 1px solid var(--border); margin-right: auto; }
         .loading-dots:after { content: '.'; animation: dots 1.5s steps(5, end) infinite; }
         @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60% { content: '...'; } 80%, 100% { content: ''; } }
+        
+        /* 모바일 최적화 미디어 쿼리 */
+        @media (max-width: 480px) {
+            .trip-name { font-size: 20px; }
+            .dday-badge { font-size: 16px; padding: 4px 8px; }
+            .clock-box { padding: 2px 6px; min-width: 60px; }
+            .clock-time { font-size: 13px; }
+        }
     </style>
 </head>
 <body>
@@ -272,10 +290,11 @@ class TravelApp {
     updateTime() {
         const kstEl = document.getElementById('clockKST');
         const locEl = document.getElementById('clockLOC');
-        if(!kstEl) return;
+        if(!kstEl || !locEl) return;
+
         const now = new Date();
-        const kstH = now.getHours();
-        this.updateClockStyle(kstEl, kstH, '서울 KST', now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit', hour12:false}));
+        const kstHour = now.getHours();
+        this.updateClockStyle(kstEl, kstHour, '서울 KST', now.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit', hour12:false}));
         const locTime = new Date(now.getTime() + (2*60*60*1000));
         this.updateClockStyle(locEl, locTime.getHours(), '현지 AEDT', locTime.toLocaleTimeString('en-AU', {hour:'2-digit', minute:'2-digit', hour12:false}));
     }
@@ -350,7 +369,7 @@ class TravelApp {
     loadData() {
         try {
             // FORCE NEW DATA LOAD (Version bump + Key change to avoid caching issues)
-            const saved = localStorage.getItem('travel_data_final_fix_complete');
+            const saved = localStorage.getItem('travel_data_final_fix_v4');
             if (saved) {
                 this.trips = JSON.parse(saved);
             } else {
@@ -391,7 +410,7 @@ class TravelApp {
             location.reload();
         }
     }
-    saveData() { localStorage.setItem('travel_data_final_fix_complete', JSON.stringify(this.trips)); }
+    saveData() { localStorage.setItem('travel_data_final_fix_v4', JSON.stringify(this.trips)); }
 
     getFilteredTrips() { return this.filterStatus==='all'?this.trips:this.trips.filter(t=>this.getTripStatus(t)===this.filterStatus); }
     getTripStatus(t) { const today=new Date(); today.setHours(0,0,0,0); const s=new Date(t.startDate); const e=new Date(t.endDate); return today<s?'upcoming':today>e?'completed':'ongoing'; }
@@ -552,7 +571,7 @@ class TravelApp {
                         <button class="btn btn-ai" onclick="app.openModal('aiModal')">✨ AI 비서</button>
                         <!-- 일정 추가 (강조 스타일) -->
                         <button class="btn btn-add-event" onclick="app.openModal('addEventModal')">➕ 일정 추가</button>
-                        <button class="btn" onclick="app.showModal('editTripModal')">✏️ 여행 수정</button>
+                        <button class="btn" onclick="app.showModal('editTripModal')">✏️ 수정</button>
                         <button class="btn" onclick="app.openModal('reviewModal')">📝 후기</button>
                         <button class="btn" onclick="app.exportToCalendar()">📅 캘린더</button>
                         <button class="btn" onclick="app.exportData()">💾 백업</button>
