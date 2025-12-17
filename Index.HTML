@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ffffff">
-    <title>여행 일정 관리 (Google Style Integrated)</title>
+    <title>여행 일정 관리 (Google Integrated)</title>
     <style>
         /* === 기본 설정 === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -18,7 +18,7 @@
             --text-secondary: #5f6368;
             --border: #dadce0; /* 구글 스타일 테두리 */
             
-            /* 버튼 스타일 (White & Sharp - User Request) */
+            /* 버튼 스타일 (White & Sharp) */
             --btn-bg: #ffffff;
             --btn-text: #202124;
             --btn-border: #202124; /* 진한 테두리 */
@@ -51,8 +51,8 @@
         
         /* D-Day 배지 */
         .dday-badge { 
-            font-size: 20px; font-weight: 700; color: var(--text-primary); 
-            border: 2px solid var(--text-primary); padding: 4px 12px; 
+            font-size: 18px; font-weight: 700; color: var(--text-primary); 
+            border: 2px solid var(--text-primary); padding: 4px 10px; 
             border-radius: var(--btn-radius); 
             white-space: nowrap; flex-shrink: 0;
         }
@@ -127,7 +127,7 @@
         .day-header { padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: var(--bg-secondary); }
         .day-card.expanded > .day-header { border-bottom: 1px solid var(--border); }
         
-        .day-number { font-size: 18px; font-weight: 700; color: var(--text-primary); width: 32px; height: 32px; border: 2px solid var(--text-primary); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-right: 12px; }
+        .day-number { font-size: 18px; font-weight: 700; color: var(--text-primary); width: 32px; height: 32px; border: 2px solid var(--text-primary); border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-right: 12px; }
         .day-text h3 { font-size: 16px; font-weight: 500; margin: 0; }
         .day-text span { font-size: 12px; color: var(--text-secondary); }
         
@@ -147,8 +147,8 @@
         .event-loc { font-size: 12px; color: var(--text-secondary); display: flex; gap: 4px; margin-bottom: 6px; }
         .event-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; white-space: pre-line; }
         .event-actions { display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #f1f5f9; padding-top: 12px; justify-content: flex-end; }
-        .btn-sm { padding: 6px 12px; border-radius: 4px; font-size: 12px; border: 1px solid var(--border); background: white; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 500;}
-        .btn-sm:hover { background: #f8fafc; border-color: var(--text-primary); }
+        .btn-sm { padding: 6px 12px; border-radius: 4px; font-size: 12px; border: 1px solid var(--border); background: white; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 500;}
+        .btn-sm:hover { background: #f8fafc; color: var(--text-primary); }
 
         /* === ✈️ 구글 항공권 스타일 (Google Flights Style) === */
         .gf-card {
@@ -159,6 +159,17 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+        }
+        /* 상단 제목 바 (Title Bar) */
+        .gf-title-bar {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
         }
         .gf-body {
             padding: 16px;
@@ -181,6 +192,8 @@
 
         .gf-right { text-align: right; min-width: 60px; }
         .gf-codes { font-size: 14px; font-weight: 700; color: var(--text-secondary); letter-spacing: 0.5px; }
+        
+        .gf-info { padding: 0 16px 12px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
 
         .gf-actions {
             border-top: 1px solid var(--border);
@@ -219,9 +232,11 @@
         .res-desc { font-size: 12px; color: var(--text-secondary); display: block; line-height: 1.3; }
         .res-details { background: #f8fafc; padding: 8px; border-radius: 4px; margin-top: 6px; margin-bottom: 6px; border: 1px solid #f1f5f9; }
         .res-row { display: flex; align-items: flex-start; gap: 4px; margin-bottom: 4px; font-size: 11px; line-height: 1.3; }
+        .res-row:last-child { margin-bottom: 0; }
         .res-icon { flex-shrink: 0; width: 14px; text-align: center; }
         .res-text { color: var(--text-secondary); }
         .res-label { font-weight: 700; color: var(--dining-color); margin-right: 2px; }
+        .btn-map-sm { font-size: 11px; padding: 3px 8px; background: #e0f2fe; color: #0284c7; border-radius: 6px; text-decoration: none; font-weight: 600; }
         .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2999; display: none; }
         .drawer-overlay.show { display: block; }
 
@@ -257,6 +272,7 @@
 <div id="photoViewer" class="photo-viewer" onclick="this.classList.remove('show')"><img id="viewerImage"></div>
 
 <script>
+// --- HTML Escape Helper ---
 const escapeHtml = (unsafe) => {
     if (typeof unsafe !== 'string') return '';
     return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -330,9 +346,9 @@ class TravelApp {
 
     loadData() {
         try {
-            // Version changed to load flight integrated data
-            const saved = localStorage.getItem('travel_data_google_integ_v1');
-            const currentVersion = '9.5'; 
+            // Version changed to force update and fix data structure
+            const saved = localStorage.getItem('travel_data_google_integ_v2');
+            const currentVersion = '11.0'; 
             const savedVersion = localStorage.getItem('appVersion');
 
             if (saved && savedVersion === currentVersion) {
@@ -376,7 +392,7 @@ class TravelApp {
             location.reload();
         }
     }
-    saveData() { localStorage.setItem('travel_data_google_integ_v1', JSON.stringify(this.trips)); }
+    saveData() { localStorage.setItem('travel_data_google_integ_v2', JSON.stringify(this.trips)); }
 
     getFilteredTrips() { return this.filterStatus==='all'?this.trips:this.trips.filter(t=>this.getTripStatus(t)===this.filterStatus); }
     getTripStatus(t) { const today=new Date(); today.setHours(0,0,0,0); const s=new Date(t.startDate); const e=new Date(t.endDate); return today<s?'upcoming':today>e?'completed':'ongoing'; }
@@ -413,7 +429,7 @@ class TravelApp {
              c.innerHTML = `<div id="editTripModal" class="modal show"><div class="modal-content"><h3>✏️ 여행 수정</h3><div class="form-group"><label class="form-label">이름</label><input id="editTripName" class="form-input" value="${escapeHtml(t.name)}"></div><div class="form-group"><label class="form-label">장소</label><input id="editTripDestination" class="form-input" value="${escapeHtml(t.destination)}"></div><div class="form-group"><label class="form-label">시작일</label><input type="date" id="editTripStartDate" class="form-input" value="${t.startDate}"></div><div class="form-group"><label class="form-label">종료일</label><input type="date" id="editTripEndDate" class="form-input" value="${t.endDate}"></div><div class="modal-actions"><button class="btn" style="border:2px solid black;font-weight:700;" onclick="app.updateTrip()">저장</button><button class="btn btn-danger" onclick="app.closeModal('editTripModal')">취소</button></div></div></div>`;
         }
         else if(id === 'settingsModal') {
-            c.innerHTML = `<div id="settingsModal" class="modal show"><div class="modal-content"><h3>⚙️ 설정</h3><div class="form-group"><label class="form-label">Gemini API Key</label><input id="apiKeyInput" class="form-input" type="password" value="${this.geminiApiKey}" placeholder="API Key 입력 (없으면 데모 모드 동작)"></div><div class="modal-actions"><button class="btn" style="border:2px solid black;font-weight:700;" onclick="app.saveApiKey()">저장</button><button class="btn btn-danger" onclick="app.closeModal('settingsModal')">닫기</button></div></div></div>`;
+            c.innerHTML = `<div id="settingsModal" class="modal show"><div class="modal-content"><h3>⚙️ 설정</h3><div class="form-group"><label class="form-label">Gemini API Key</label><input id="apiKeyInput" class="form-input" type="password" value="${this.geminiApiKey}" placeholder="API Key 입력 (없으면 데모 모드 동작)"></div><div class="modal-actions"><button class="btn btn-primary" onclick="app.saveApiKey()">저장</button><button class="btn btn-danger" onclick="app.closeModal('settingsModal')">닫기</button></div></div></div>`;
         }
         else if(id === 'reviewModal') {
             c.innerHTML = `<div id="reviewModal" class="modal show"><div class="modal-content"><h3>📝 후기</h3><div class="form-group"><textarea id="tripReview" class="form-textarea" placeholder="여행 후기를 작성하세요">${this.trips[this.currentTripIndex].review || ''}</textarea></div>
@@ -425,6 +441,7 @@ class TravelApp {
         }
     }
     
+    // [Fix] showModal을 통해 ID 설정 후 openModal 호출 (안정화)
     openEditEventModal(id) { 
         this.editingEventId = id; 
         this.openModal('editEventModal'); 
@@ -432,10 +449,11 @@ class TravelApp {
     
     closeModal(id) { document.getElementById('modal-container').innerHTML=''; }
     
+    // --- Calendar Helper ---
     renderCalendarDays() {
         let html = '';
         const tripStart = 22; const tripEnd = 29;
-        html += `<div class="calendar-day empty"></div>`;
+        html += `<div class="calendar-day empty"></div>`; // Dec 1 starts on Mon
         for(let i=1; i<=31; i++) {
             const isTrip = i >= tripStart && i <= tripEnd;
             html += `<div class="calendar-day ${isTrip?'trip':''}">${i}</div>`;
@@ -443,6 +461,7 @@ class TravelApp {
         return html;
     }
 
+    // --- AI ---
     async handleChat() {
         const i=document.getElementById('chatInput'); const m=i.value.trim(); if(!m)return;
         this.addChatMsg('user',m); i.value=''; this.addChatMsg('ai','...',true);
@@ -459,13 +478,16 @@ class TravelApp {
         } catch(e){this.addChatMsg('ai','통신 오류');}
     }
     addChatMsg(r,t,l=false) { const b=document.getElementById('chatBox'); b.innerHTML+=`<div class="chat-msg ${r}">${l?`<span class="loading-dots">...</span>`:t}</div>`; b.scrollTop=b.scrollHeight; }
-    
+    async autoFillEventDesc() { 
+        if(!this.geminiApiKey) { alert('AI API 키가 필요합니다.'); return; }
+    }
+
     async generateReview() {
         if(!this.geminiApiKey) { alert('AI 기능을 사용하려면 설정에서 API 키를 입력해주세요. (데모 모드에서는 지원하지 않습니다)'); return; }
         document.getElementById('tripReview').value = "AI가 작성 중입니다...";
     }
-    async autoFillEventDesc() { alert('AI 키 설정 필요'); }
 
+    // --- Actions ---
     addEvent() { const t=document.getElementById('newEventTitle').value; if(!t)return; const tr=this.trips[this.currentTripIndex]; tr.events.push({id:this.generateEventId(), title:t, description:document.getElementById('newEventDescription').value, date:tr.startDate, time:'09:00', category:'관광', completed:false, photos:[]}); this.saveData(); this.closeModal('addEventModal'); this.render(); }
     updateEvent() { 
         try {
@@ -501,9 +523,9 @@ class TravelApp {
         t.review = document.getElementById('tripReview').value;
         this.saveData(); this.closeModal('reviewModal');
     }
-    exportData() { alert('백업'); }
-    importData() { alert('복원'); }
-    exportToCalendar() { alert('캘린더 파일 다운로드'); }
+    exportData() { const b=new Blob([JSON.stringify(this.trips)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='backup.json'; a.click(); }
+    importData(f) { const r=new FileReader(); r.onload=e=>{this.trips=JSON.parse(e.target.result);this.saveData();this.render();}; r.readAsText(f); }
+    exportToCalendar() { alert('ICS 다운로드 (기능 예시)'); }
     changeFilter(s) { this.filterStatus=s; this.render(); }
     saveApiKey() { const k=document.getElementById('apiKeyInput').value; if(k){this.geminiApiKey=k;localStorage.setItem('gemini_api_key',k);alert('저장됨');this.closeModal('settingsModal');} }
     viewPhoto(src) { document.getElementById('viewerImage').src=src; document.getElementById('photoViewer').classList.add('show'); }
@@ -594,6 +616,7 @@ class TravelApp {
             const flight = e.flightData || { from: 'DEP', to: 'ARR', airline: 'Flight', duration: '' };
             return `
             <div class="gf-card">
+                <div class="gf-title-bar">${e.title}</div>
                 <div class="gf-body">
                     <div class="gf-left">
                         <div class="gf-airline-logo">${flight.airline ? flight.airline[0] : '✈️'}</div>
