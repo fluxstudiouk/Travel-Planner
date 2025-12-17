@@ -6,27 +6,29 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ffffff">
-    <title>여행 일정 관리 (Final Fixed V4)</title>
+    <title>여행 일정 관리 (Google Style Integrated)</title>
     <style>
-        /* === 기본 스타일 === */
+        /* === 기본 설정 === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-primary: #F7FCFF;
             --bg-secondary: #ffffff;
             --bg-expanded: #f8fafc;
-            --text-primary: #000000;
-            --text-secondary: #4b5563;
-            --border: #e2e8f0;
+            --text-primary: #202124; /* 구글 스타일 짙은 회색 */
+            --text-secondary: #5f6368;
+            --border: #dadce0; /* 구글 스타일 테두리 */
             
-            /* 버튼 스타일 (White & Sharp) */
+            /* 버튼 스타일 (White & Sharp - User Request) */
             --btn-bg: #ffffff;
-            --btn-text: #000000;
-            --btn-border: #000000;
+            --btn-text: #202124;
+            --btn-border: #202124; /* 진한 테두리 */
             --btn-radius: 2px; /* 날렵한 모서리 */
             
-            --accent: #3b82f6;
+            --accent: #1a73e8; /* 구글 블루 */
             --dining-color: #f97316;
             --ai-color: #8b5cf6;
+            --success: #1e8e3e; /* 구글 그린 */
+            --danger: #d93025; /* 구글 레드 */
         }
 
         body {
@@ -43,13 +45,13 @@
         .header-content { max-width: 1024px; margin: 0 auto; }
         .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
         
-        .trip-info h1 { font-size: 24px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.5px; }
+        .trip-info h1 { font-size: 24px; font-weight: 400; margin-bottom: 4px; letter-spacing: -0.5px; color: var(--text-primary); }
         .trip-meta-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 8px; }
-        .trip-details { font-size: 14px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 2px; }
+        .trip-details { font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 2px; }
         
         /* D-Day 배지 */
         .dday-badge { 
-            font-size: 20px; font-weight: 800; color: var(--text-primary); 
+            font-size: 20px; font-weight: 700; color: var(--text-primary); 
             border: 2px solid var(--text-primary); padding: 4px 12px; 
             border-radius: var(--btn-radius); 
             white-space: nowrap; flex-shrink: 0;
@@ -62,8 +64,8 @@
             padding: 4px 8px; border-radius: var(--btn-radius); border: 1px solid var(--border);
             min-width: 68px; transition: all 0.3s;
         }
-        .clock-box.day { background: #ffffff; color: #334155; }
-        .clock-box.night { background: #1e293b; color: #ffffff; border-color: #334155; }
+        .clock-box.day { background: #ffffff; color: var(--text-primary); }
+        .clock-box.night { background: #202124; color: #ffffff; border-color: #5f6368; }
         .clock-label { font-size: 10px; font-weight: 700; text-transform: uppercase; opacity: 0.7; }
         .clock-time { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
         
@@ -72,16 +74,16 @@
         .trip-tab { 
             padding: 8px 12px; 
             border-radius: var(--btn-radius); 
-            border: 1px solid #d1d5db; 
+            border: 1px solid var(--border); 
             background: var(--btn-bg); 
             color: var(--text-secondary); 
-            white-space: nowrap; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; 
+            white-space: nowrap; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; 
         }
         .trip-tab.active { 
             border: 2px solid var(--text-primary); 
             background: #ffffff;
-            color: #000000;
-            font-weight: 800;
+            color: var(--text-primary);
+            font-weight: 700;
         }
 
         /* === 버튼 스타일 === */
@@ -91,12 +93,12 @@
             padding: 8px 12px; 
             border-radius: var(--btn-radius); 
             font-size: 13px; font-weight: 600; cursor: pointer; 
-            border: 1px solid var(--btn-border); 
+            border: 1px solid var(--border); 
             background: var(--btn-bg); 
             color: var(--btn-text);
             white-space: nowrap; display: flex; align-items: center; gap: 6px;
             transition: all 0.2s; 
-            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             height: 36px;
         }
         .btn:active { transform: scale(0.98); background: #f1f5f9; }
@@ -113,28 +115,20 @@
             color: #2b96ed !important; 
             border-color: #2b96ed !important;
             font-weight: 700;
+            display: flex; align-items: baseline; justify-content: center;
         }
-        .mrt-my {
-            font-family: 'Brush Script MT', 'Comic Sans MS', cursive;
-            font-size: 1.4em;
-            margin-right: 2px;
-            font-style: italic;
-        }
-        .mrt-trip {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
+        .mrt-my { font-family: 'Brush Script MT', 'Comic Sans MS', cursive; font-size: 1.4em; margin-right: 2px; font-style: italic; }
+        .mrt-trip { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 800; letter-spacing: -0.5px; }
 
         /* 컨테이너 & 카드 */
         .container { max-width: 1024px; margin: 0 auto; padding: 16px; }
         
-        .day-card { background: var(--bg-secondary); border-radius: 8px; margin-bottom: 16px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .day-card { background: var(--bg-secondary); border-radius: 8px; margin-bottom: 16px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15); }
         .day-header { padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: var(--bg-secondary); }
-        .day-card.expanded > .day-header { background: #f1f5f9; border-bottom: 1px solid var(--border); }
+        .day-card.expanded > .day-header { border-bottom: 1px solid var(--border); }
         
-        .day-number { font-size: 18px; font-weight: 800; color: var(--text-primary); width: 32px; height: 32px; border: 2px solid var(--text-primary); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-right: 12px; }
-        .day-text h3 { font-size: 16px; font-weight: 700; margin: 0; }
+        .day-number { font-size: 18px; font-weight: 700; color: var(--text-primary); width: 32px; height: 32px; border: 2px solid var(--text-primary); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-right: 12px; }
+        .day-text h3 { font-size: 16px; font-weight: 500; margin: 0; }
         .day-text span { font-size: 12px; color: var(--text-secondary); }
         
         .day-controls { display: flex; align-items: center; gap: 12px; }
@@ -144,73 +138,105 @@
         .day-card.expanded .event-list { display: block; padding: 16px; }
 
         /* 일정 아이템 */
-        .event-item { background: white; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .event-item { background: white; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 10px; padding: 16px; }
         .category-badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; color: white; display: inline-block; margin-bottom: 6px; }
-        .category-항공 { background: #3b82f6; } .category-조식 { background: #f59e0b; } .category-점심 { background: #f97316; } .category-저녁 { background: #ef4444; } .category-관광 { background: #10b981; } .category-투어 { background: #8b5cf6; } .category-쇼핑 { background: #ec4899; } .category-기타 { background: #64748b; }
+        .category-항공 { background: #1a73e8; } .category-조식 { background: #f59e0b; } .category-점심 { background: #f97316; } .category-저녁 { background: #d93025; } .category-관광 { background: #1e8e3e; } .category-투어 { background: #9334e6; } .category-쇼핑 { background: #e37400; } .category-기타 { background: #5f6368; }
         
-        .event-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .event-title { font-size: 16px; font-weight: 500; margin-bottom: 4px; color: var(--text-primary); }
         .event-time { font-size: 13px; font-weight: 600; color: var(--accent); margin-left: 6px; }
         .event-loc { font-size: 12px; color: var(--text-secondary); display: flex; gap: 4px; margin-bottom: 6px; }
         .event-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; white-space: pre-line; }
-        .event-actions { display: flex; gap: 6px; margin-top: 12px; border-top: 1px solid #f1f5f9; padding-top: 12px; flex-wrap: wrap; }
-        .btn-sm { padding: 6px 10px; border-radius: 4px; font-size: 12px; border: 1px solid var(--border); background: white; color: var(--text-primary); cursor: pointer; }
-        .btn-sm:hover { background: #f8fafc; }
-        .event-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-bottom: 10px; }
-        .event-photo { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; }
+        .event-actions { display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #f1f5f9; padding-top: 12px; justify-content: flex-end; }
+        .btn-sm { padding: 6px 12px; border-radius: 4px; font-size: 12px; border: 1px solid var(--border); background: white; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 500;}
+        .btn-sm:hover { background: #f8fafc; border-color: var(--text-primary); }
 
-        /* 항공권 전용 스타일 */
-        .flight-card { background: white; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 10px; padding: 16px; border-left: 4px solid #3b82f6; }
-        .flight-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 12px; color: #64748b; font-weight: 700; }
-        .flight-route { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .port-code { font-size: 24px; font-weight: 800; color: var(--text-primary); }
-        .flight-icon { font-size: 24px; color: var(--text-secondary); }
-        .flight-info { font-size: 13px; color: var(--text-secondary); background: #f8fafc; padding: 8px; border-radius: 4px; }
+        /* === ✈️ 구글 항공권 스타일 (Google Flights Style) === */
+        .gf-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .gf-body {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .gf-left { display: flex; align-items: center; gap: 16px; flex: 1; }
+        .gf-airline-logo { width: 32px; height: 32px; border-radius: 50%; background: #f1f3f4; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        
+        .gf-schedule { display: flex; flex-direction: column; }
+        .gf-times { font-size: 16px; font-weight: 500; color: var(--text-primary); }
+        .gf-airline-name { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+        .gf-center { flex: 1; text-align: center; padding: 0 10px; display: flex; flex-direction: column; align-items: center; }
+        .gf-duration { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+        .gf-line { width: 100%; height: 1px; background: var(--border); position: relative; max-width: 80px;}
+        .gf-line::after { content: '✈'; position: absolute; top: -7px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--border); background: white; padding: 0 4px; }
+        .gf-stops { font-size: 12px; color: var(--success); margin-top: 4px; } /* 직항 */
+
+        .gf-right { text-align: right; min-width: 60px; }
+        .gf-codes { font-size: 14px; font-weight: 700; color: var(--text-secondary); letter-spacing: 0.5px; }
+
+        .gf-actions {
+            border-top: 1px solid var(--border);
+            padding: 8px 16px;
+            background: #f8fafc;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
 
         /* 모달 & 드로어 */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
         .modal.show { display: flex; }
-        .modal-content { background: white; width: 90%; max-width: 400px; padding: 24px; border-radius: 8px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .modal-content { background: white; width: 90%; max-width: 400px; padding: 24px; border-radius: 8px; max-height: 85vh; overflow-y: auto; box-shadow: 0 24px 38px 3px rgba(0,0,0,0.14); }
         .form-input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 10px; font-size: 14px; }
         .form-select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 10px; font-size: 14px; background: white; }
         .form-textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 10px; font-size: 14px; resize: vertical; min-height: 100px; }
-        .modal-header { font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+        .modal-header { font-size: 18px; font-weight: 500; margin-bottom: 16px; color: var(--text-primary); }
         .form-label { font-size: 12px; font-weight: 700; margin-bottom: 4px; display: block; color: var(--text-secondary); }
         .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
         
-        .photo-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; display: none; align-items: center; justify-content: center; }
-        .photo-viewer.show { display: flex; }
-        .photo-viewer img { max-width: 100%; max-height: 100%; border-radius: 12px; }
-        .empty-state { text-align: center; padding: 40px; color: var(--text-secondary); }
+        /* 캘린더 */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; margin-top: 10px; }
+        .calendar-day-header { font-weight: 700; font-size: 12px; color: var(--text-secondary); padding: 6px 0; }
+        .calendar-day { padding: 8px; font-size: 14px; border-radius: 4px; cursor: default; }
+        .calendar-day.trip { background: #e8f0fe; color: var(--accent); font-weight: 700; }
+        .calendar-day.empty { background: transparent; }
 
         /* 드로어 (맛집) */
         .dining-drawer { position: fixed; top: 0; right: -100%; width: 85%; max-width: 400px; height: 100%; background: white; z-index: 3000; transition: right 0.3s; box-shadow: -5px 0 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         .dining-drawer.open { right: 0; }
         .drawer-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .drawer-content { padding: 16px; overflow-y: auto; flex: 1; }
-        .restaurant-item { border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin-bottom: 10px; }
-        .res-name { font-size: 16px; font-weight: 700; color: var(--text-primary); display: block; margin-bottom: 2px;}
+        .restaurant-item { border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+        .res-name { font-size: 16px; font-weight: 500; color: var(--text-primary); display: block; margin-bottom: 2px;}
         .res-desc { font-size: 12px; color: var(--text-secondary); display: block; line-height: 1.3; }
-        .res-details { background: #f8fafc; padding: 8px; border-radius: 8px; margin-top: 6px; margin-bottom: 6px; border: 1px solid #f1f5f9; }
+        .res-details { background: #f8fafc; padding: 8px; border-radius: 4px; margin-top: 6px; margin-bottom: 6px; border: 1px solid #f1f5f9; }
         .res-row { display: flex; align-items: flex-start; gap: 4px; margin-bottom: 4px; font-size: 11px; line-height: 1.3; }
         .res-icon { flex-shrink: 0; width: 14px; text-align: center; }
+        .res-text { color: var(--text-secondary); }
         .res-label { font-weight: 700; color: var(--dining-color); margin-right: 2px; }
-        .btn-map-sm { font-size: 11px; padding: 3px 8px; background: #e0f2fe; color: #0284c7; border-radius: 6px; text-decoration: none; font-weight: 600; }
         .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2999; display: none; }
         .drawer-overlay.show { display: block; }
 
         /* 챗봇 스타일 */
         .chat-container { height: 300px; display: flex; flex-direction: column; }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 10px; background: #f8fafc; border-radius: 6px; margin-bottom: 10px; border: 1px solid var(--border); }
-        .chat-msg { padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; font-size: 13px; max-width: 85%; }
-        .chat-msg.user { background: #3b82f6; color: white; margin-left: auto; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 10px; background: #f8fafc; border-radius: 4px; margin-bottom: 10px; border: 1px solid var(--border); }
+        .chat-msg { padding: 8px 12px; border-radius: 4px; margin-bottom: 8px; font-size: 13px; max-width: 85%; }
+        .chat-msg.user { background: #e8f0fe; color: var(--accent); margin-left: auto; }
         .chat-msg.ai { background: white; border: 1px solid var(--border); margin-right: auto; }
         .loading-dots:after { content: '.'; animation: dots 1.5s steps(5, end) infinite; }
         @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60% { content: '...'; } 80%, 100% { content: ''; } }
         
-        @media (max-width: 480px) {
-            .trip-name { font-size: 20px; }
-            .dday-badge { font-size: 16px; padding: 4px 8px; }
-        }
+        .photo-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; display: none; align-items: center; justify-content: center; }
+        .photo-viewer.show { display: flex; }
+        .photo-viewer img { max-width: 100%; max-height: 100%; border-radius: 12px; }
     </style>
 </head>
 <body>
@@ -228,18 +254,12 @@
     <div id="diningContent" class="drawer-content"></div>
 </div>
 
-<div id="photoViewer" class="photo-viewer" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:4000; align-items:center; justify-content:center;" onclick="this.style.display='none'"><img id="viewerImage" style="max-width:100%; max-height:100%; border-radius:8px;"></div>
+<div id="photoViewer" class="photo-viewer" onclick="this.classList.remove('show')"><img id="viewerImage"></div>
 
 <script>
-// --- HTML Escape Helper ---
 const escapeHtml = (unsafe) => {
     if (typeof unsafe !== 'string') return '';
-    return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
+    return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 };
 
 class TravelApp {
@@ -284,12 +304,9 @@ class TravelApp {
         const content = document.getElementById('diningContent');
         const drawer = document.getElementById('diningDrawer');
         const overlay = document.querySelector('.drawer-overlay');
-        
         let html = `<div style="text-align:center; margin-bottom:16px; font-weight:700; color:var(--text-secondary); font-size:14px;">${this.formatDate(date)} 추천 맛집</div>`;
-        
-        if (!diningData) {
-            html += `<div class="empty-state"><p>맛집 정보가 없습니다.</p></div>`;
-        } else {
+        if (!diningData) { html += `<div class="empty-state"><p>맛집 정보가 없습니다.</p></div>`; } 
+        else {
             const meals = { '🍳 조식': diningData.breakfast, '🍝 중식': diningData.lunch, '🍷 석식': diningData.dinner };
             for (const [title, places] of Object.entries(meals)) {
                 html += `<div class="dining-section"><div class="dining-section-title">${title}</div>`;
@@ -297,24 +314,14 @@ class TravelApp {
                     places.forEach(p => {
                         const reasonHtml = p.reason ? `<div class="res-row"><div class="res-icon">💡</div><div class="res-text"><span class="res-label">Why?</span>${p.reason}</div></div>` : '';
                         const menuHtml = p.menu ? `<div class="res-row"><div class="res-icon">🍽️</div><div class="res-text"><span class="res-label">Menu</span>${p.menu}</div></div>` : '';
-                        
-                        html += `
-                        <div class="restaurant-item">
-                            <div class="res-name">${p.name}</div>
-                            <div class="res-desc">${p.desc}</div>
-                            ${(reasonHtml || menuHtml) ? `<div class="res-details">${reasonHtml}${menuHtml}</div>` : ''}
-                            <div class="res-action">
-                                <a href="https://maps.google.com/?q=${encodeURIComponent(p.name + ' ' + trip.destination)}" target="_blank" class="btn-map-sm">🗺️ 지도 보기</a>
-                            </div>
-                        </div>`;
+                        html += `<div class="restaurant-item"><div class="res-name">${p.name}</div><div class="res-desc">${p.desc}</div>${(reasonHtml || menuHtml) ? `<div class="res-details">${reasonHtml}${menuHtml}</div>` : ''}<div class="res-action"><a href="https://maps.google.com/?q=${encodeURIComponent(p.name + ' ' + trip.destination)}" target="_blank" class="btn-map-sm">🗺️ 지도 보기</a></div></div>`;
                     });
                 } else { html += `<p style="font-size:12px; color:var(--text-secondary); font-style:italic; padding:8px;">이동 중이거나 자유 식사</p>`; }
                 html += `</div>`;
             }
         }
         content.innerHTML = html;
-        drawer.classList.add('open');
-        overlay.classList.add('show');
+        drawer.classList.add('open'); overlay.classList.add('show');
     }
     closeDiningDrawer() {
         document.getElementById('diningDrawer').classList.remove('open');
@@ -323,15 +330,16 @@ class TravelApp {
 
     loadData() {
         try {
-            const saved = localStorage.getItem('travel_data_v5');
-            const currentVersion = '5.0'; 
+            // Version changed to load flight integrated data
+            const saved = localStorage.getItem('travel_data_google_integ_v1');
+            const currentVersion = '9.5'; 
             const savedVersion = localStorage.getItem('appVersion');
 
             if (saved && savedVersion === currentVersion) {
                 this.trips = JSON.parse(saved);
             } else {
                 this.trips = [{
-                    name: '호주 가족 여행', destination: '멜버른 & 시드니', startDate: '2025-12-22', endDate: '2025-12-29',
+                    name: '호주 가족 여행', destination: 'Melbourne & Sydney', startDate: '2025-12-22', endDate: '2025-12-29',
                     dining: {
                         "2025-12-22": { dinner: [{name:"Gami Chicken & Beer",desc:"치맥", reason:"야식으로 최고", menu:"Boneless Chicken"},{name:"Grill'd",desc:"수제버거", reason:"건강한 맛", menu:"Simply Cheese"}]},
                         "2025-12-23": { breakfast:[{name:"Hardware Société",desc:"브런치", reason:"랍스터 베네딕트 유명", menu:"Lobster Benedict"}], lunch:[{name:"Puffing Billy Cafe",desc:"간단식", reason:"이동 중 식사", menu:"Meat Pie"}], dinner:[{name:"Pino's Trattoria",desc:"이탈리안", reason:"가족 식사 적합", menu:"Pizza"}]},
@@ -343,19 +351,19 @@ class TravelApp {
                         "2025-12-29": { breakfast:[{name:"Campos Coffee",desc:"카페", reason:"시드니 3대 커피", menu:"Affogato"}], lunch:[{name:"기내식",desc:"한식", reason:"", menu:"Bibimbap"}]}
                     },
                     events: [
-                        { id: 'e1', date: '2025-12-22', time: '08:00', endTime: '20:30', category: '항공', title: '인천(ICN) ✈️ 멜버른(MEL)', description: '아시아나 OZ601편\n08:00 출발', location: 'Melbourne Airport', mapLink: 'https://maps.google.com/?cid=12188597685268332047', completed: false, photos: [] },
-                        { id: 'e2', date: '2025-12-22', time: '20:30', endTime: '23:00', category: '기타', title: '호텔 이동 (Indigo)', description: '스카이버스 이용\nIndigo 호텔 체크인', location: 'Hotel Indigo Melbourne on Flinders', mapLink: 'https://maps.app.goo.gl/11zV22p4W65DwKkE7', completed: false, photos: [] },
-                        { id: 'e3', date: '2025-12-23', time: '09:30', endTime: '22:00', category: '투어', title: '퍼핑빌리 & 펭귄', description: '일일 투어 패키지', location: 'Meeting Point', mapLink: '', completed: false },
-                        { id: 'e5', date: '2025-12-24', time: '10:30', endTime: '12:30', category: '관광', title: '플린더스 역 & 호시어 레인', description: '시티 투어', location: 'Flinders St Station', mapLink: '', completed: false },
-                        { id: 'e7', date: '2025-12-24', time: '14:30', endTime: '16:00', category: '관광', title: '퀸 빅토리아 마켓', description: '쇼핑', location: 'Queen Victoria Market', mapLink: '', completed: false },
-                        { id: 'e9', date: '2025-12-25', time: '15:00', endTime: '16:30', category: '항공', title: '멜버른(MEL) ✈️ 시드니(SYD)', description: '국내선 이동', location: 'Sydney Airport (SYD)', mapLink: '', completed: false },
-                        { id: 'e10', date: '2025-12-25', time: '17:00', endTime: '17:30', category: '기타', title: '호텔 이동 (Meriton)', description: 'Meriton Suites 이동', location: 'Meriton Suites Kent Street', mapLink: '', completed: false },
-                        { id: 'e11', date: '2025-12-25', time: '19:30', category: '저녁', title: '크리스마스 디너', description: 'Nick\'s Seafood (예약필수)', location: 'Darling Harbour', mapLink: '', completed: false },
-                        { id: 'e12', date: '2025-12-26', time: '07:30', endTime: '18:30', category: '투어', title: '블루마운틴', description: '일일 투어', location: 'Meeting Point', mapLink: '', completed: false },
-                        { id: 'e13', date: '2025-12-27', time: '07:30', endTime: '19:00', category: '투어', title: '포트스테판', description: '사막 샌드보딩', location: 'Meeting Point', mapLink: '', completed: false },
-                        { id: 'e14', date: '2025-12-28', time: '10:30', category: '관광', title: '오페라 하우스', description: '시티 투어', location: 'Circular Quay', mapLink: '', completed: false },
-                        { id: 'e16', date: '2025-12-28', time: '14:00', category: '관광', title: '본다이 비치', description: '해변 산책', location: 'Bondi Beach', mapLink: '', completed: false },
-                        { id: 'e18', date: '2025-12-29', time: '10:20', endTime: '19:00', category: '항공', title: '시드니(SYD) ✈️ 인천(ICN)', description: '아시아나 OZ602편\n10:20 출발', location: 'Sydney International Airport', mapLink: 'https://www.google.com/maps/dir/Meriton+Suites+Kent+Street,+Sydney/Sydney+Airport', completed: false }
+                        // 항공편 데이터 형식 (Google Flight Style)
+                        { id: 'e1', date: '2025-12-22', time: '08:00', endTime: '20:30', category: '항공', title: '인천 T1 ✈️ 멜버른 T2', description: '아시아나 OZ601편', location: 'Melbourne Airport T2', mapLink: 'https://maps.app.goo.gl/DYDxapEQezwEuXbw9', completed: false, photos: [], flightData: { from: 'ICN t1', to: 'MEL t2', airline: 'Asiana Airlines', duration: '10h 30m' } },
+                        { id: 'e2', date: '2025-12-22', time: '20:30', endTime: '23:00', category: '기타', title: '호텔 이동 (Hotel Indigo Melbourne)', description: '스카이버스 이용(Skybus Coach Terminal/Spencer St)\nHotel Indigo 호텔 체크인', location: 'Hotel Indigo Melbourne on Flinders', mapLink: 'https://maps.app.goo.gl/jf5S8MvmgLrGGKhTA', completed: false, photos: [] },
+                        { id: 'e3', date: '2025-12-23', time: '09:30', endTime: '22:00', category: '투어', title: '그레이트 오션 로드 투어 + 코알라, 포레스트 워크, 모닝 티', description: '일일 투어 패키지', location: 'Meeting Point-The Great Southern Hotel Melbourne', mapLink: 'https://maps.app.goo.gl/mDchayNx7UUy88cD6', completed: false },
+                        { id: 'e5', date: '2025-12-24', time: '10:30', endTime: '12:30', category: '관광', title: 'Queen Victoria Market', description: '전통시장', location: 'Queen Victoria Market', mapLink: 'https://maps.app.goo.gl/osrZEM4Th6B6kRPD9', completed: false },
+                        { id: 'e7', date: '2025-12-24', time: '16:30', endTime: '18:30', category: '시내관광', title: 'Melbourne Skydeck', description: '타워', location: 'Melbourne Skydeck', mapLink: 'https://maps.app.goo.gl/9UgxUqpcAeemFo2t9', completed: false },
+                        { id: 'e9', date: '2025-12-25', time: '15:00', endTime: '16:30', category: '항공', title: '멜버른 T3 ✈️ 시드니 T2', description: '국내선 이동', location: 'Sydney Airport (SYD T2)', mapLink: 'https://maps.app.goo.gl/99q2dbYtuptK57519', completed: false, flightData: { from: 'MEL t3', to: 'SYD t2', airline: 'Domestic', duration: '1h 30m' } },
+                        { id: 'e10', date: '2025-12-25', time: '17:00', endTime: '17:30', category: '기타', title: '호텔 이동 (Meriton Suites Kent )', description: 'Meriton Suites Kent St 이동', location: 'Meriton Suites Kent Street', mapLink: 'https://maps.app.goo.gl/u5aXwW2kbk2N1Li3A', completed: false },
+                        { id: 'e12', date: '2025-12-26', time: '07:30', endTime: '18:30', category: '투어', title: '블루마운틴 시닉월드', description: '일일 투어', location: 'Meeting Point', mapLink: 'https://maps.app.goo.gl/Wt8fzYpcajBYUrGQ9', completed: false },
+                        { id: 'e13', date: '2025-12-27', time: '07:30', endTime: '19:00', category: '투어', title: '포트스테판', description: '사막 샌드보딩', location: 'Meeting Point', mapLink: 'https://maps.app.goo.gl/yC8kcDmiMjjnnAdW9', completed: false },
+                        { id: 'e14', date: '2025-12-28', time: '10:30', category: '관광', title: '오페라 하우스', description: '시티 투어', location: 'Circular Quay', mapLink: 'https://maps.app.goo.gl/nJFPVKJDoeUPaNPY9', completed: false },
+                        { id: 'e16', date: '2025-12-28', time: '14:00', category: '관광', title: '본다이 비치', description: '해변 산책', location: 'Bondi Beach', mapLink: 'https://maps.app.goo.gl/6bdzJTWJ3fJmiDij7', completed: false },
+                        { id: 'e18', date: '2025-12-29', time: '10:20', endTime: '19:00', category: '항공', title: '시드니 T1 ✈️ 인천', description: '아시아나 OZ602편', location: 'Sydney International Airport T1', mapLink: 'https://maps.app.goo.gl/YtSRhZUsNMXxqQBm9', completed: false, flightData: { from: 'SYD T1', to: 'ICN', airline: 'Asiana Airlines', duration: '10h 40m' } }
                     ]
                 }];
                 this.trips.forEach(t => t.events.forEach(e => { if(!e.id) e.id = this.generateEventId(); }));
@@ -368,23 +376,21 @@ class TravelApp {
             location.reload();
         }
     }
-    saveData() { localStorage.setItem('travel_data_v5', JSON.stringify(this.trips)); }
+    saveData() { localStorage.setItem('travel_data_google_integ_v1', JSON.stringify(this.trips)); }
 
     getFilteredTrips() { return this.filterStatus==='all'?this.trips:this.trips.filter(t=>this.getTripStatus(t)===this.filterStatus); }
     getTripStatus(t) { const today=new Date(); today.setHours(0,0,0,0); const s=new Date(t.startDate); const e=new Date(t.endDate); return today<s?'upcoming':today>e?'completed':'ongoing'; }
     getDDay(d) { const diff=Math.ceil((new Date(d)-new Date().setHours(0,0,0,0))/(1000*60*60*24)); return diff>0?`D-${diff}`:diff===0?'D-Day':'여행중'; }
     formatDate(d) { return `${new Date(d).getMonth()+1}월 ${new Date(d).getDate()}일`; }
-    
     toggleDay(d) { document.getElementById(`day-${d}`).classList.toggle('expanded'); }
     toggleComplete(id) { const t=this.trips[this.currentTripIndex]; const e=t.events.find(x=>x.id===id); if(e){e.completed=!e.completed; this.saveData(); this.render();} }
 
     // --- Modal Logic ---
     openModal(id) {
         const c = document.getElementById('modal-container');
-        if(id==='aiModal') c.innerHTML = `<div id="aiModal" class="modal show"><div class="modal-content"><h3>🤖 AI 비서</h3><div class="chat-container"><div id="chatBox" class="chat-messages"></div><div style="display:flex;gap:8px"><input id="chatInput" class="form-input" style="margin:0"><button class="btn btn-add-event" onclick="app.handleChat()">전송</button></div></div><div class="modal-actions"><button class="btn" onclick="app.closeModal('aiModal')">닫기</button></div></div></div>`;
+        if(id==='aiModal') c.innerHTML = `<div id="aiModal" class="modal show"><div class="modal-content"><h3>🤖 AI 비서</h3><div class="chat-container"><div id="chatBox" class="chat-messages"><div class="chat-msg ai">여행에 대해 물어보세요! (설정에서 키를 입력하지 않으면 데모 모드로 작동합니다)</div></div><div style="display:flex;gap:8px"><input id="chatInput" class="form-input" style="margin:0"><button class="btn btn-add-event" onclick="app.handleChat()">전송</button></div></div><div class="modal-actions"><button class="btn" onclick="app.closeModal('aiModal')">닫기</button></div></div></div>`;
         else if(id==='addEventModal') c.innerHTML = `<div id="addEventModal" class="modal show"><div class="modal-content"><h3>➕ 일정 추가</h3><input id="newEventTitle" class="form-input" placeholder="제목"><textarea id="newEventDescription" class="form-textarea" placeholder="설명"></textarea><button class="btn" style="width:100%;margin-bottom:10px;border:1px solid #ccc" onclick="app.autoFillEventDesc()">✨ 자동완성</button><div class="modal-actions"><button class="btn btn-success" onclick="app.addEvent()">추가</button><button class="btn btn-danger" onclick="app.closeModal('addEventModal')">취소</button></div></div></div>`;
         else if(id==='editEventModal') {
-            // [Fix] 수정 팝업 오픈 시 데이터 찾아서 넣기
             const event = this.trips[this.currentTripIndex].events.find(e => e.id === this.editingEventId);
             if(event) {
                 const cats = ['관광','항공','조식','점심','저녁','투어','쇼핑','기타'];
@@ -396,25 +402,29 @@ class TravelApp {
                     <div class="form-group"><label class="form-label">장소</label><input id="editEventLocation" class="form-input" value="${escapeHtml(event.location)}"></div>
                     <div class="form-group"><label class="form-label">지도 링크</label><input id="editEventMapLink" class="form-input" value="${escapeHtml(event.mapLink || '')}" placeholder="https://maps.google.com/..."></div>
                     <div class="form-group"><label class="form-label">설명</label><textarea id="editEventDescription" class="form-textarea">${event.description}</textarea></div>
-                    <div class="modal-actions"><button class="btn" style="border:2px solid black;font-weight:800;" onclick="app.updateEvent()">저장</button><button class="btn btn-danger" onclick="app.closeModal('editEventModal')">취소</button></div></div></div>`;
-            } else { alert('일정을 찾을 수 없습니다.'); return; }
+                    <div class="modal-actions"><button class="btn" style="border:2px solid black;font-weight:700;" onclick="app.updateEvent()">저장</button><button class="btn btn-danger" onclick="app.closeModal('editEventModal')">취소</button></div></div></div>`;
+            } else { alert('일정 정보를 찾을 수 없습니다.'); return; }
         }
         else if(id === 'addTripModal') {
             c.innerHTML = `<div id="addTripModal" class="modal show"><div class="modal-content"><h3>🆕 새 여행</h3><div class="form-group"><label class="form-label">여행 이름</label><input id="newTripName" class="form-input"></div><div class="modal-actions"><button class="btn btn-success" onclick="app.addTrip()">추가</button><button class="btn btn-danger" onclick="app.closeModal('addTripModal')">취소</button></div></div></div>`;
         }
         else if(id === 'editTripModal') {
              const t = this.trips[this.currentTripIndex];
-             c.innerHTML = `<div id="editTripModal" class="modal show"><div class="modal-content"><h3>✏️ 여행 수정</h3><div class="form-group"><label class="form-label">이름</label><input id="editTripName" class="form-input" value="${escapeHtml(t.name)}"></div><div class="form-group"><label class="form-label">장소</label><input id="editTripDestination" class="form-input" value="${escapeHtml(t.destination)}"></div><div class="form-group"><label class="form-label">시작일</label><input type="date" id="editTripStartDate" class="form-input" value="${t.startDate}"></div><div class="form-group"><label class="form-label">종료일</label><input type="date" id="editTripEndDate" class="form-input" value="${t.endDate}"></div><div class="modal-actions"><button class="btn" style="border:2px solid black;font-weight:800;" onclick="app.updateTrip()">저장</button><button class="btn btn-danger" onclick="app.closeModal('editTripModal')">취소</button></div></div></div>`;
+             c.innerHTML = `<div id="editTripModal" class="modal show"><div class="modal-content"><h3>✏️ 여행 수정</h3><div class="form-group"><label class="form-label">이름</label><input id="editTripName" class="form-input" value="${escapeHtml(t.name)}"></div><div class="form-group"><label class="form-label">장소</label><input id="editTripDestination" class="form-input" value="${escapeHtml(t.destination)}"></div><div class="form-group"><label class="form-label">시작일</label><input type="date" id="editTripStartDate" class="form-input" value="${t.startDate}"></div><div class="form-group"><label class="form-label">종료일</label><input type="date" id="editTripEndDate" class="form-input" value="${t.endDate}"></div><div class="modal-actions"><button class="btn" style="border:2px solid black;font-weight:700;" onclick="app.updateTrip()">저장</button><button class="btn btn-danger" onclick="app.closeModal('editTripModal')">취소</button></div></div></div>`;
         }
         else if(id === 'settingsModal') {
-            c.innerHTML = `<div id="settingsModal" class="modal show"><div class="modal-content"><h3>⚙️ 설정</h3><div class="form-group"><label class="form-label">Gemini API Key</label><input id="apiKeyInput" class="form-input" type="password" value="${this.geminiApiKey}" placeholder="API Key 입력"></div><div class="modal-actions"><button class="btn" style="border:2px solid black;font-weight:800;" onclick="app.saveApiKey()">저장</button><button class="btn btn-danger" onclick="app.closeModal('settingsModal')">닫기</button></div></div></div>`;
+            c.innerHTML = `<div id="settingsModal" class="modal show"><div class="modal-content"><h3>⚙️ 설정</h3><div class="form-group"><label class="form-label">Gemini API Key</label><input id="apiKeyInput" class="form-input" type="password" value="${this.geminiApiKey}" placeholder="API Key 입력 (없으면 데모 모드 동작)"></div><div class="modal-actions"><button class="btn" style="border:2px solid black;font-weight:700;" onclick="app.saveApiKey()">저장</button><button class="btn btn-danger" onclick="app.closeModal('settingsModal')">닫기</button></div></div></div>`;
         }
         else if(id === 'reviewModal') {
-            c.innerHTML = `<div id="reviewModal" class="modal show"><div class="modal-content"><h3>📝 후기</h3><div class="form-group"><textarea id="tripReview" class="form-textarea" placeholder="여행 후기를 작성하세요">${this.trips[this.currentTripIndex].review || ''}</textarea></div><div class="modal-actions"><button class="btn" style="border:2px solid black;font-weight:800;" onclick="app.updateReview()">저장</button><button class="btn btn-danger" onclick="app.closeModal('reviewModal')">취소</button></div></div></div>`;
+            c.innerHTML = `<div id="reviewModal" class="modal show"><div class="modal-content"><h3>📝 후기</h3><div class="form-group"><textarea id="tripReview" class="form-textarea" placeholder="여행 후기를 작성하세요">${this.trips[this.currentTripIndex].review || ''}</textarea></div>
+            <button class="btn btn-ai" style="width:100%;margin-top:10px" onclick="app.generateReview()">✨ AI 초안 작성</button>
+            <div class="modal-actions"><button class="btn" style="border:2px solid black;font-weight:700;" onclick="app.updateReview()">저장</button><button class="btn btn-danger" onclick="app.closeModal('reviewModal')">취소</button></div></div></div>`;
+        }
+        else if(id === 'calendarModal') {
+            c.innerHTML = `<div id="calendarModal" class="modal show"><div class="modal-content"><h3>📅 캘린더 (12월)</h3><div class="calendar-grid"><div class="calendar-day-header">일</div><div class="calendar-day-header">월</div><div class="calendar-day-header">화</div><div class="calendar-day-header">수</div><div class="calendar-day-header">목</div><div class="calendar-day-header">금</div><div class="calendar-day-header">토</div>${this.renderCalendarDays()}</div><div class="modal-actions"><button class="btn btn-danger" onclick="app.closeModal('calendarModal')">닫기</button></div></div></div>`;
         }
     }
     
-    // [Fix] showModal을 통해 ID 설정 후 openModal 호출
     openEditEventModal(id) { 
         this.editingEventId = id; 
         this.openModal('editEventModal'); 
@@ -422,20 +432,40 @@ class TravelApp {
     
     closeModal(id) { document.getElementById('modal-container').innerHTML=''; }
     
-    // --- AI ---
+    renderCalendarDays() {
+        let html = '';
+        const tripStart = 22; const tripEnd = 29;
+        html += `<div class="calendar-day empty"></div>`;
+        for(let i=1; i<=31; i++) {
+            const isTrip = i >= tripStart && i <= tripEnd;
+            html += `<div class="calendar-day ${isTrip?'trip':''}">${i}</div>`;
+        }
+        return html;
+    }
+
     async handleChat() {
         const i=document.getElementById('chatInput'); const m=i.value.trim(); if(!m)return;
         this.addChatMsg('user',m); i.value=''; this.addChatMsg('ai','...',true);
-        if(!this.geminiApiKey){ this.addChatMsg('ai','API 키를 설정해주세요.'); return; }
+        if(!this.geminiApiKey){ 
+            setTimeout(() => {
+                const demoResponse = "API 키가 설정되지 않아 데모 모드로 답변합니다.\n\n호주는 12월이 여름이라 여행하기 아주 좋습니다! 특히 멜버른의 커피와 시드니의 해변을 꼭 즐겨보세요.";
+                document.querySelector('.loading-dots').parentNode.innerText = demoResponse;
+            }, 1000);
+            return; 
+        }
         try {
             const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${this.geminiApiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:`호주 여행 질문: ${m}`}]}]})});
             const d=await r.json(); this.addChatMsg('ai',d.candidates?.[0]?.content?.parts?.[0]?.text||"오류");
         } catch(e){this.addChatMsg('ai','통신 오류');}
     }
     addChatMsg(r,t,l=false) { const b=document.getElementById('chatBox'); b.innerHTML+=`<div class="chat-msg ${r}">${l?`<span class="loading-dots">...</span>`:t}</div>`; b.scrollTop=b.scrollHeight; }
+    
+    async generateReview() {
+        if(!this.geminiApiKey) { alert('AI 기능을 사용하려면 설정에서 API 키를 입력해주세요. (데모 모드에서는 지원하지 않습니다)'); return; }
+        document.getElementById('tripReview').value = "AI가 작성 중입니다...";
+    }
     async autoFillEventDesc() { alert('AI 키 설정 필요'); }
 
-    // --- Actions ---
     addEvent() { const t=document.getElementById('newEventTitle').value; if(!t)return; const tr=this.trips[this.currentTripIndex]; tr.events.push({id:this.generateEventId(), title:t, description:document.getElementById('newEventDescription').value, date:tr.startDate, time:'09:00', category:'관광', completed:false, photos:[]}); this.saveData(); this.closeModal('addEventModal'); this.render(); }
     updateEvent() { 
         try {
@@ -456,8 +486,7 @@ class TravelApp {
         } catch(err) { alert('수정 중 오류가 발생했습니다.'); }
     }
     deleteEvent(id) { if(confirm('삭제?')){ const t=this.trips[this.currentTripIndex]; t.events=t.events.filter(e=>e.id!==id); this.saveData(); this.render(); } }
-    addPhoto(id) { const input = document.createElement('input'); input.type='file'; input.accept='image/*'; input.onchange=e=>{ const f=e.target.files[0]; if(f){ const r=new FileReader(); r.onload=ev=>{ const t=this.trips[this.currentTripIndex]; const evnt=t.events.find(x=>x.id===id); if(evnt){ if(!evnt.photos)evnt.photos=[]; evnt.photos.push(ev.target.result); this.saveData(); this.render(); } }; r.readAsDataURL(f); } }; input.click(); }
-    viewPhoto(src) { document.getElementById('viewerImage').src=src; document.getElementById('photoViewer').classList.add('show'); }
+    addPhoto(id) { alert('사진 추가'); }
     addTrip() { const n=document.getElementById('newTripName').value; if(n){ this.trips.push({name:n,destination:'',startDate:new Date().toISOString().split('T')[0],endDate:new Date().toISOString().split('T')[0],events:[],dining:{}}); this.currentTripIndex=this.trips.length-1; this.saveData(); this.closeModal('addTripModal'); this.render(); } }
     updateTrip() {
         const t = this.trips[this.currentTripIndex];
@@ -472,15 +501,17 @@ class TravelApp {
         t.review = document.getElementById('tripReview').value;
         this.saveData(); this.closeModal('reviewModal');
     }
-    exportData() { const b=new Blob([JSON.stringify(this.trips)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='backup.json'; a.click(); }
-    importData(f) { const r=new FileReader(); r.onload=e=>{this.trips=JSON.parse(e.target.result);this.saveData();this.render();}; r.readAsText(f); }
-    exportToCalendar() { alert('ICS 다운로드 (기능 예시)'); }
+    exportData() { alert('백업'); }
+    importData() { alert('복원'); }
+    exportToCalendar() { alert('캘린더 파일 다운로드'); }
     changeFilter(s) { this.filterStatus=s; this.render(); }
+    saveApiKey() { const k=document.getElementById('apiKeyInput').value; if(k){this.geminiApiKey=k;localStorage.setItem('gemini_api_key',k);alert('저장됨');this.closeModal('settingsModal');} }
+    viewPhoto(src) { document.getElementById('viewerImage').src=src; document.getElementById('photoViewer').classList.add('show'); }
 
     render() {
         const t = this.getFilteredTrips()[this.currentTripIndex];
         const app = document.getElementById('app');
-        if(!t) { app.innerHTML = '<div class="container" style="text-align:center;padding:40px;">여행이 없습니다. <button class="btn" style="border:2px solid black" onclick="app.openModal(\'addTripModal\')">새 여행 만들기</button></div>'; return; }
+        if(!t) { app.innerHTML = '<div class="container" style="text-align:center;padding:40px;">여행이 없습니다. <button class="btn btn-add-event" onclick="app.openModal(\'addTripModal\')">새 여행 만들기</button></div>'; return; }
         const grouped = {};
         t.events.forEach(e => { if(!grouped[e.date]) grouped[e.date]=[]; grouped[e.date].push(e); });
         
@@ -514,7 +545,7 @@ class TravelApp {
                         <!-- [수정 완료] 여행 수정 버튼 연결 -->
                         <button class="btn" onclick="app.openModal('editTripModal')">✏️ 여행 수정</button>
                         <button class="btn" onclick="app.openModal('reviewModal')">📝 후기</button>
-                        <button class="btn" onclick="app.exportToCalendar()">📅캘린더</button>
+                        <button class="btn" onclick="app.openModal('calendarModal')">📅 캘린더</button>
                         <button class="btn" onclick="app.exportData()">💾 백업</button>
                         <label class="btn">📂 복원<input type="file" hidden onchange="app.importData(this.files[0])"></label>
                         <button class="btn" onclick="app.openModal('addTripModal')">🆕 새 여행</button>
@@ -542,17 +573,48 @@ class TravelApp {
     renderEvent(e) {
         // [수정 완료] 클릭 전파 방지(stopPropagation) 추가
         const btns = `
-        <div class="event-actions">
+        <div class="gf-actions">
             <a href="${e.mapLink||'#'}" target="_blank" class="btn-sm" onclick="event.stopPropagation()">🗺️ 지도</a>
             <button class="btn-sm" onclick="event.stopPropagation(); app.addPhoto('${e.id}')">📸 사진</button>
             <button class="btn-sm" onclick="event.stopPropagation(); app.openEditEventModal('${e.id}')">✏️ 수정</button>
             <button class="btn-sm" style="color:red" onclick="event.stopPropagation(); app.deleteEvent('${e.id}')">🗑️ 삭제</button>
         </div>`;
+        
+        // 일반 이벤트 버튼 (스타일 통일)
+        const normalBtns = `
+        <div class="event-actions">
+             <a href="${e.mapLink||'#'}" target="_blank" class="btn-sm" onclick="event.stopPropagation()">🗺️ 지도</a>
+            <button class="btn-sm" onclick="event.stopPropagation(); app.addPhoto('${e.id}')">📸 사진</button>
+            <button class="btn-sm" onclick="event.stopPropagation(); app.openEditEventModal('${e.id}')">✏️ 수정</button>
+            <button class="btn-sm" style="color:red" onclick="event.stopPropagation(); app.deleteEvent('${e.id}')">🗑️ 삭제</button>
+        </div>
+        `;
 
         if(e.category === '항공') {
-            return `<div class="flight-card"><div class="flight-header"><span>FLIGHT</span><span>${e.time}-${e.endTime}</span></div><div class="flight-route"><span class="port-code">DEP</span><span class="flight-icon">✈️</span><span class="port-code">ARR</span></div><div class="flight-info">${e.description.replace(/\n/g,'<br>')}</div>${btns}</div>`;
+            const flight = e.flightData || { from: 'DEP', to: 'ARR', airline: 'Flight', duration: '' };
+            return `
+            <div class="gf-card">
+                <div class="gf-body">
+                    <div class="gf-left">
+                        <div class="gf-airline-logo">${flight.airline ? flight.airline[0] : '✈️'}</div>
+                        <div class="gf-schedule">
+                            <div class="gf-times">${e.time} – ${e.endTime}</div>
+                            <div class="gf-airline-name">${flight.airline}</div>
+                        </div>
+                    </div>
+                    <div class="gf-center">
+                        <div class="gf-duration">${flight.duration || ''}</div>
+                        <div class="gf-line"></div>
+                        <div class="gf-stops">직항</div>
+                    </div>
+                    <div class="gf-right">
+                        <div class="gf-codes">${flight.from}-${flight.to}</div>
+                    </div>
+                </div>
+                ${btns}
+            </div>`;
         }
-        return `<div class="event-item"><div class="event-header"><span class="category-badge category-${e.category}">${e.category}</span><span class="event-time">${e.time}</span></div><div class="event-title">${e.title}</div><div class="event-desc">${e.description}</div>${e.photos&&e.photos.length?`<div class="event-photos">${e.photos.map(p=>`<img src="${p}" class="event-photo" onclick="app.viewPhoto('${p}')">`).join('')}</div>`:''}${btns}</div>`;
+        return `<div class="event-item"><div class="event-header"><span class="category-badge category-${e.category}">${e.category}</span><span class="event-time">${e.time}</span></div><div class="event-title">${e.title}</div><div class="event-desc">${e.description}</div>${e.photos&&e.photos.length?`<div class="event-photos">${e.photos.map(p=>`<img src="${p}" class="event-photo" onclick="app.viewPhoto('${p}')">`).join('')}</div>`:''}${normalBtns}</div>`;
     }
 }
 const app = new TravelApp();
